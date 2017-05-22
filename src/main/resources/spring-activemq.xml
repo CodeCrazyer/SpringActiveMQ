@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:jms="http://www.springframework.org/schema/jms"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+	http://www.springframework.org/schema/jms http://www.springframework.org/schema/jms/spring-jms-4.0.xsd">
+
+
+	<bean id="connectionFactory" class="org.apache.activemq.ActiveMQConnectionFactory"
+		p:brokerURL="${activemq.url}" p:userName="${activemq.username}"
+		p:password="${activemq.password}" />
+
+	<!-- 自定义fastjson消息转换器，不写会使用默认的消息自转换器 -->
+	<bean id="messageConverter" class="com.activemq.core.FastJsonMessageConverter"/>
+	
+	<!-- Queue类型jms操作模板 -->
+	<bean id="queueTemplate" class="org.springframework.jms.core.JmsTemplate"
+		p:connectionFactory-ref="connectionFactory" p:pubSubDomain="false" p:messageConverter-ref="messageConverter"/>
+
+	<!-- Topic类型jms操作模板 -->
+	<bean id="topicTemplate" class="org.springframework.jms.core.JmsTemplate"
+		p:connectionFactory-ref="connectionFactory" p:pubSubDomain="true"  p:messageConverter-ref="messageConverter"/>
+
+	<bean id="consumer" class="com.activemq.listener.Consumer" />
+	<bean id="consumer2" class="com.activemq.listener.Consumer2" />
+	<bean id="consumer3" class="com.activemq.listener.Consumer3" />
+	
+	<!-- queue监听器  -->
+	<jms:listener-container destination-type="queue" container-type="default"
+		connection-factory="connectionFactory" acknowledge="auto" message-converter="messageConverter">
+		<jms:listener destination="test.queue" ref="consumer" />
+		<jms:listener destination="test.queue" ref="consumer2" />
+		<jms:listener destination="test.queue" ref="consumer3" />
+	</jms:listener-container>
+	
+	<!-- topic监听器  -->
+	<jms:listener-container destination-type="topic" container-type="default"
+		connection-factory="connectionFactory" acknowledge="auto" message-converter="messageConverter">
+		<jms:listener destination="test.topic" ref="consumer" />
+		<jms:listener destination="test.topic" ref="consumer2" />
+		<jms:listener destination="test.topic" ref="consumer3" />
+	</jms:listener-container>
+
+</beans>

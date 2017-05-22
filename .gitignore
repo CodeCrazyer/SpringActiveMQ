@@ -1,0 +1,11 @@
+/.classpath
+/.project
+/target/
+/.settings/
+/build/
+/.eclipse
+/.idea/
+/.springBeans
+/src/test
+/.jsdtscope
+/org.eclipse
